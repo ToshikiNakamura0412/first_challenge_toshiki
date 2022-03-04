@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="first_challenge_toshiki" type= "first_challenge_toshiki" name="first_challenge_toshiki" output="screen"/>
+    <node pkg="roomba_500driver_meiji"  type="main500" name="roomba_500driver_meiji"/>
+    <node pkg="urg_node" name="urg_node" type="urg_node" args="_ip_address:=192.168.1.113"/>
+</launch>
