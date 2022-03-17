@@ -14,16 +14,19 @@ FirstChallenge::FirstChallenge():private_nh_("~"), nh_("")
     pub_cmd_vel_ = nh_.advertise<roomba_500driver_meiji::RoombaCtrl>("/roomba/control", 1);
 }
 
+// odmetryのコールバック関数
 void FirstChallenge::odometry_callback(const nav_msgs::Odometry::ConstPtr& msg)
 {
     odometry_ = *msg;
 }
 
+// laserのコールバック関数
 void FirstChallenge::laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
     laser_ = *msg;
 }
 
+// 直進
 int FirstChallenge::straight()
 {
     cmd_vel_.mode = 11; // 任意の動きを実行するモード
@@ -33,6 +36,7 @@ int FirstChallenge::straight()
     return 1;
 }
 
+// 旋回
 int FirstChallenge::turn()
 {
     cmd_vel_.mode = 11;
@@ -42,6 +46,7 @@ int FirstChallenge::turn()
     return 2;
 }
 
+// 停止
 int FirstChallenge::stop()
 {
     cmd_vel_.mode = 11;
@@ -98,6 +103,7 @@ int FirstChallenge::move()
     return move_command;
 }
 
+// レーザ値の最小値を返す
 float FirstChallenge::get_scan_min()
 {
     float range_min   = 1e6;
@@ -115,6 +121,7 @@ float FirstChallenge::get_scan_min()
     return range_min;
 }
 
+// オイラー角から計算したyaw角を返す
 float FirstChallenge::get_yaw()
 {
     tf::Quaternion quat(odometry_.pose.pose.orientation.x, odometry_.pose.pose.orientation.y, odometry_.pose.pose.orientation.z, odometry_.pose.pose.orientation.w);
@@ -124,6 +131,7 @@ float FirstChallenge::get_yaw()
     return float(yaw);
 }
 
+// 目標旋回角に達するまでTrueを返す
 bool FirstChallenge::can_turn()
 {
     float current_yaw = get_yaw();
@@ -136,6 +144,7 @@ bool FirstChallenge::can_turn()
     return true;
 }
 
+// 壁との距離が目標値以内であればTrueを返す
 bool FirstChallenge::can_find_wall()
 {
     if(get_scan_min() <= distance_target_to_wall_)
@@ -144,6 +153,7 @@ bool FirstChallenge::can_find_wall()
         return false;
 }
 
+// 初期位置と現在位置の直線距離の算出
 void FirstChallenge::cal_distance()
 {
     float dx = odometry_.pose.pose.position.x;
@@ -151,6 +161,7 @@ void FirstChallenge::cal_distance()
     distance_ = sqrt(powf(dx, 2.0)+powf(dy, 2.0));
 }
 
+// 実行した動作と各種状態の表示
 void FirstChallenge::print_info(int move_command)
 {
     switch(move_command)
